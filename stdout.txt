@@ -1,1 +1,11 @@
-{"score":0}
+
+> @ test /home/zaqueu/codenation/react-native-6
+> jest --env=jsdom
+
+  console.error node_modules/react/cjs/react.development.js:188
+    Warning: Each child in a list should have a unique "key" prop.
+    
+    Check the render method of `Main`. See https://fb.me/react-warning-keys for more information.
+        in Fragment (created by Main)
+        in Main
+

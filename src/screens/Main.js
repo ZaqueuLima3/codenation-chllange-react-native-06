@@ -1,43 +1,48 @@
-import React, { PureComponent, useEffect } from "react";
-import ApolloClient from "apollo-boost";
-import { gql } from "apollo-boost";
+import React, { useState } from "react";
+import { ScrollView, Text, Image, ActivityIndicator } from "react-native";
 
-import { StyleSheet, ScrollView } from "react-native";
+import { useQuery, ApolloProvider } from "@apollo/react-hooks";
+import ApolloClient, { gql } from "apollo-boost";
 
 const client = new ApolloClient({
   uri: "https://graphql-pokemon.now.sh/"
 });
 
-function Main() {
-  useEffect(() => {
-    let data;
-    async function run() {
-      data = await test();
-      console.log(data);
-    }
-    run();
+export default function Main() {
+  const [pokemons, setPokemons] = useState([]);
+
+  const GET_POKEMONS = gql(
+    `query pokemons($first: Int!) {
+      pokemons(first: $first) {
+        id
+        number
+        name
+        image
+        types
+    }}`
+  );
+  const { loading, error, data } = useQuery(GET_POKEMONS, {
+    variables: { first: 20 }
   });
-  async function test() {
-    const response = await client.query({
-      query: gql`
-        {
-          pokemon(name: "Pikachu") {
-            id
-            name
-          }
-        }
-      `
-    });
-    return response;
-  }
-  return <ScrollView style={styles.container}></ScrollView>;
+
+  if (error) return `Error ${error}`;
+
+  return (
+    <ApolloProvider client={client}>
+      <ScrollView style={styles.container}>
+        {loading ? (
+          <ActivityIndicator></ActivityIndicator>
+        ) : (
+          data.pokemons.map(pokemon => (
+            <>
+              <Image className="pokemon-image" source={{ uri: "photo" }} />
+              <Text className="pokemon-name">001 - Test</Text>
+              <Text className="pokemon-type">testType</Text>
+              <Text className="pokemon-type">testType 2</Text>
+            </>
+          ))
+        )}
+      </ScrollView>
+    </ApolloProvider>
+  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff"
-  }
-});
-
-export default Main;
